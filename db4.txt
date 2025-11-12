@@ -1,0 +1,67 @@
+DROP DATABASE IF EXISTS Nilesh;
+CREATE DATABASE Nilesh;
+USE Nilesh;
+
+CREATE TABLE Borrower (
+  roll_no INT PRIMARY KEY,
+  name VARCHAR(100),
+  DOI DATE,
+  book_name VARCHAR(200),
+  status VARCHAR(20)
+);
+
+CREATE TABLE Fine (
+  roll_no INT,
+  fine_date DATE,
+  amount DECIMAL(10,2)
+);
+
+INSERT INTO Borrower VALUES
+(12, 'Vedant', '2018-07-01', 'xyz', 'issued'),
+(14, 'Sankalp', '2018-06-01', 'oop', 'issued'),
+(16, 'Vaibhav', '2018-05-01', 'coa', 'returned'),
+(18, 'Nilesh', '2018-06-15', 'toc', 'returned'),
+(20, 'Ashwin', '2018-05-15', 'mp', 'issued');
+
+DROP PROCEDURE IF EXISTS B;
+DELIMITER //
+CREATE PROCEDURE B(IN roll_new INT, IN b_name VARCHAR(200))
+proc_lbl: BEGIN
+  DECLARE v_doi DATE;
+  DECLARE v_days INT DEFAULT 0;
+  DECLARE v_amt DECIMAL(10,2) DEFAULT 0;
+  DECLARE notfound INT DEFAULT 0;
+  DECLARE CONTINUE HANDLER FOR NOT FOUND SET notfound = 1;
+  SELECT DOI INTO v_doi
+  FROM Borrower
+  WHERE roll_no = roll_new AND book_name = b_name
+  LIMIT 1;
+  IF notfound = 1 OR v_doi IS NULL THEN
+    SELECT 'NOT FOUND' AS message;
+    LEAVE proc_lbl;
+  END IF;
+  SET v_days = DATEDIFF(CURDATE(), v_doi);
+  IF v_days > 30 THEN
+    SET v_amt = v_days * 50;
+  ELSEIF v_days > 15 THEN
+    SET v_amt = v_days * 5;
+  ELSE
+    SET v_amt = 0;
+  END IF;
+  IF v_amt > 0 THEN
+    INSERT INTO Fine (roll_no, fine_date, amount)
+    VALUES (roll_new, CURDATE(), v_amt);
+  END IF;
+  UPDATE Borrower
+  SET status = 'returned'
+  WHERE roll_no = roll_new AND book_name = b_name;
+  SELECT CONCAT('Processed roll=', roll_new, ', days=', v_days, ', fine=', v_amt) AS info;
+END //
+DELIMITER ;
+
+CALL B(12, 'xyz');
+CALL B(20, 'mp');
+CALL B(99, 'unknown');
+
+SELECT * FROM Fine;
+SELECT * FROM Borrower;
