@@ -1,3 +1,4 @@
+
 DROP DATABASE IF EXISTS Nilesh;
 CREATE DATABASE Nilesh;
 USE Nilesh;
@@ -64,4 +65,5 @@ CALL B(20, 'mp');
 CALL B(99, 'unknown');
 
 SELECT * FROM Fine;
+
 SELECT * FROM Borrower;
