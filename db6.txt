@@ -1,3 +1,12 @@
+Title:-
+ To create cursors: Implicit, Explicit Parameterized Cursor, Cursor FOR Loop.
+ Problem Definition:-
+ Write a PL/SQL block of code using parameterized Cursor, that willmerge the data available in the
+ newly created table N_RollCall with the data available in the table O_RollCall. If the data in the
+ first table already exist in the second table then that data should be s
+
+
+
 DROP DATABASE IF EXISTS Abhi;
 CREATE DATABASE Abhi;
 USE Abhi;
@@ -48,4 +57,5 @@ CALL p3(0);
 SELECT * FROM n_rollcall;
 INSERT INTO o_rollcall VALUES(6,'Patil','Kolhapur');
 CALL p3(4);
+
 SELECT * FROM n_rollcall;
